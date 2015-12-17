@@ -11,6 +11,7 @@ from bs4 import BeautifulSoup
 import datetime
 from babel.dates import format_date, format_datetime, format_time
 import ipaddress
+import re
 
 try:
     # For Python 3.0 and later
@@ -42,6 +43,10 @@ def parse_result(url, next_batch = ""):
                         newlines = soup.select('.diff-addedline')
                         for n in newlines:
                             text = n.text.lstrip(':').strip()
+
+                            signature = "\[\[.*\]]\)? \d{1,2} .* à \d{1,2}:\d{1,2} \(CES?T\)"
+                            re.sub(signature, ' ', text)
+
                             if user not in users_sentences.keys():
                                 users_sentences[user] = []
                             if text not in users_sentences[user]:
@@ -79,7 +84,7 @@ users_dir = 'users/'
 users_sentences = {}
 
 base = datetime.datetime.today()
-backlog = 10 # the number of days of "Bistro" page to parse from today
+backlog = 8 # the number of days of "Bistro" page to parse from today
 
 root_url = "https://fr.wikipedia.org"
 dates_list = [format_date(base - datetime.timedelta(days=x), locale='fr_FR', format='long') for x in range(0, backlog)]

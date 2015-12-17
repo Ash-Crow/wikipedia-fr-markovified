@@ -5,9 +5,14 @@ import markovify
 
 user = "Jean-Jacques_Georges"
 user = "TomT0m"
-#user = "Simon_Villeneuve"
-user = "Starus"
-user = "TigH"
+user = "Simon_Villeneuve"
+#user = "Starus"
+#user = "TigH"
+user = "Ash_Crow"
+#user = "Oliv0"
+#user = "Treehill"
+#user = "Superbenjamin"
+
 
 # Get raw text as string.
 with open("users/{}.txt".format(user)) as f:
@@ -24,7 +29,7 @@ for i in range(5):
 
 print("==========")
 # Print three randomly-generated sentences of no more than 140 characters
-for i in range(3):
-    print(text_model.make_short_sentence(140))
+#for i in range(3):
+#    print(text_model.make_short_sentence(140))
 
 f.close()
