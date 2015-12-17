@@ -2,16 +2,12 @@
 # -*- coding: utf-8 -*-
 
 import markovify
+import sys
 
-user = "Jean-Jacques_Georges"
-user = "TomT0m"
-user = "Simon_Villeneuve"
-#user = "Starus"
-#user = "TigH"
-user = "Ash_Crow"
-#user = "Oliv0"
-#user = "Treehill"
-#user = "Superbenjamin"
+if len(sys.argv) > 1:
+    user = sys.argv[1]
+else:
+    user = "Ash_Crow"
 
 
 # Get raw text as string.
