@@ -4,9 +4,11 @@
 import markovify
 
 user = "Jean-Jacques_Georges"
-#user = "TomT0m"
+user = "TomT0m"
 #user = "Simon_Villeneuve"
-#user = "Warp3"
+user = "Starus"
+user = "TigH"
+
 # Get raw text as string.
 with open("users/{}.txt".format(user)) as f:
     text = f.read()

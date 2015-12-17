@@ -10,6 +10,7 @@ import json
 from bs4 import BeautifulSoup
 import datetime
 from babel.dates import format_date, format_datetime, format_time
+import ipaddress
 
 try:
     # For Python 3.0 and later
@@ -33,15 +34,18 @@ def parse_result(url, next_batch = ""):
         for rev in revisions:
             if 'user' in rev.keys():
                 user = rev['user']
-            else:
-                user = "unknown"
-            if 'diff' in rev.keys():
-                if '*' in rev['diff']:
-                    soup = BeautifulSoup(rev['diff']['*'])
-                    newlines = soup.select('.diff-addedline')
-                    for n in newlines:
-                        text = n.text.lstrip(':').strip()
-                        save_text(user, text)
+
+            if authorized_user(user):
+                if 'diff' in rev.keys():
+                    if '*' in rev['diff']:
+                        soup = BeautifulSoup(rev['diff']['*'])
+                        newlines = soup.select('.diff-addedline')
+                        for n in newlines:
+                            text = n.text.lstrip(':').strip()
+                            if user not in users_sentences.keys():
+                                users_sentences[user] = []
+                            if text not in users_sentences[user]:
+                                users_sentences[user].append(text)
 
     if "continue" in data.keys():
         print("continue tag: " + data['continue']['rvcontinue'])
@@ -53,18 +57,42 @@ def save_text(user, text):
         f.write(text + ' ')
         f.close()
 
-# Get the contents
-users_dir = 'users/'
+def authorized_user(user):
+    """Check if we want to register this user's edits or not."""
+    auth = False
 
-root_url = "https://fr.wikipedia.org"
+    # Exclude bots
+    ban_list = ['NaggoBot']
+
+    # Exclude anonymous
+    if user not in ban_list:
+        try: 
+            ipaddress.ip_address(user)
+        except ValueError:
+            auth = True
+
+    return auth
+
+# Get the contents
+
+users_dir = 'users/'
+users_sentences = {}
 
 base = datetime.datetime.today()
-dates_list = [format_date(base - datetime.timedelta(days=x), locale='fr_FR', format='long') for x in range(0, 365)]
+backlog = 10 # the number of days of "Bistro" page to parse from today
+
+root_url = "https://fr.wikipedia.org"
+dates_list = [format_date(base - datetime.timedelta(days=x), locale='fr_FR', format='long') for x in range(0, backlog)]
 
 for date in dates_list:
     print("{} ".format(date))
     page_titles = { "titles" : "Wikipédia:Le Bistro/{}".format(date) }
     
-    api_call =  root_url + "/w/api.php?action=query&prop=revisions&format=json&rvprop=user&rvlimit=500&rvdiffto=prev&" + urllib.parse.urlencode(page_titles)
+    api_call =  root_url + "/w/api.php?action=query&prop=revisions&format=json&rvprop=user&rvlimit=1&rvdiffto=prev&" + urllib.parse.urlencode(page_titles)
 
     parse_result(api_call)
+
+
+for user, chunks in users_sentences.items():
+    text = " ".join(chunks)
+    save_text(user, text)
