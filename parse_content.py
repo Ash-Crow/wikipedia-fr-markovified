@@ -14,7 +14,6 @@ import ipaddress
 import re
 import sys
 
-
 try:
     # For Python 3.0 and later
     from urllib.request import urlopen
@@ -24,7 +23,7 @@ except ImportError:
 
 def remove_signatures(message):
     """Tries to remove the user signature from the messages. Not always possible because of the customized signatures"""
-    signature = "-{0,2} ?(<(span|div) .*>)?\[\[.* à \d{1,2}:\d{1,2} \(CES?T\)"
+    signature = "[—-]{0,2}(&nbsp;| )?(<(span|div) .*>)?\[\[.* à \d{1,2}:\d{1,2} \(CES?T\)"
     message = re.sub(signature, ' ', message)
     return message
 
@@ -74,7 +73,7 @@ def authorized_user(user):
     auth = False
 
     # Exclude bots
-    ban_list = ['NaggoBot']
+    ban_list = ['NaggoBot', 'ZéroBot', 'HerculeBot']
 
     # Exclude anonymous
     if user not in ban_list:
@@ -98,15 +97,13 @@ else:
     backlog = 30 # the number of days of "Bistro" page to parse from today
 
 users_dir = 'users/'
-users_sentences = {}
-
-
-
 
 root_url = "https://fr.wikipedia.org"
 dates_list = [format_date(base - datetime.timedelta(days=x), locale='fr_FR', format='long') for x in range(0, backlog)]
 
 for date in dates_list:
+    users_sentences = {}
+
     print("{} ".format(date))
     page_titles = { "titles" : "Wikipédia:Le Bistro/{}".format(date) }
     
@@ -115,7 +112,6 @@ for date in dates_list:
 
     parse_result(api_call)
 
-
-for user, chunks in users_sentences.items():
-    text = " ".join(chunks)
-    save_text(user, text)
+    for user, chunks in users_sentences.items():
+        text = " ".join(chunks)
+        save_text(user, text)

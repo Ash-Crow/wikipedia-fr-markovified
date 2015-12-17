@@ -9,7 +9,6 @@ if len(sys.argv) > 1:
 else:
     user = "Ash_Crow"
 
-
 # Get raw text as string.
 with open("users/{}.txt".format(user)) as f:
     text = f.read()
