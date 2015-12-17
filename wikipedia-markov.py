@@ -21,7 +21,7 @@ text_model = markovify.Text(text, state_size=state)
 
 # Print five randomly-generated sentences
 for i in range(5):
-    print(text_model.make_sentence())
+    print(text_model.make_sentence(tries=42))
 
 print("==========")
 # Print three randomly-generated sentences of no more than 140 characters

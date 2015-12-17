@@ -24,7 +24,7 @@ except ImportError:
 
 def remove_signatures(message):
     """Tries to remove the user signature from the messages. Not always possible because of the customized signatures"""
-    signature = "(<span .*>)?\[\[.*\]]\)?(<\/span>)? \d{1,2} .* à \d{1,2}:\d{1,2} \(CES?T\)"
+    signature = "-{0,2} ?(<(span|div) .*>)?\[\[.* à \d{1,2}:\d{1,2} \(CES?T\)"
     message = re.sub(signature, ' ', message)
     return message
 
@@ -52,8 +52,6 @@ def parse_result(url, next_batch = ""):
                         for n in newlines:
                             text = n.text.lstrip(':').strip()
 
-                            text = remove_signatures(text)
-
                             if user not in users_sentences.keys():
                                 users_sentences[user] = []
                             if text not in users_sentences[user]:
@@ -64,6 +62,8 @@ def parse_result(url, next_batch = ""):
         parse_result(url, data['continue']['rvcontinue'])
 
 def save_text(user, text):
+    text = remove_signatures(text)
+
     user_file = users_dir + user.replace(' ', '_') + '.txt'
     with open(user_file,"a") as f:
         f.write(text + ' ')
@@ -87,7 +87,8 @@ def authorized_user(user):
 
 # Get the contents
 if len(sys.argv) > 1:
-    base = datetime.datetime(sys.argv[1])
+    date_fragments = sys.argv[1].split('-')
+    base = datetime.datetime(int(date_fragments[0]),int(date_fragments[1]),int(date_fragments[2]))
 else:
     base = datetime.datetime.today()
 
